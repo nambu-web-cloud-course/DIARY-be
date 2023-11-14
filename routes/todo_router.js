@@ -51,11 +51,12 @@ router.get('/', isAuth, async (req, res)=>{
 
 //members_no로 내 할일 가져오기 http://{{host}}/todos/1
 router.get('/:id', isAuth, async (req, res)=>{
-    const members_no = req.params.members_no;
+    const members_no = req.params.id;
     const result =  await Todo.findAll ({
         where: { members_no: members_no },
         attributes: ['id', 'todo_content', 'created_at', 'updated_at'],
     })
+    console.log('data:', result);
     res.send({ success:true, data: result });
 })
 
@@ -64,12 +65,22 @@ router.put('/:todo_no', isAuth, async (req, res)=>{
     const todo_no = req.params.todo_no;
     const result = await Todo.update(
         req.body,
-        { where: { members_no: todo_no }}
+        { where: { id: todo_no }}
     );
     console.log(result);
     req.body.id = todo_no;
     res.send({ success: true, data: req.body });
 });
+
+//todo_no로 해당 할일 삭제하기 http://{{host}}/todos/1
+router.delete('/:todo_no', isAuth, async (req, res)=>{
+    const todo_no = req.params.todo_no;
+    const result = await Todo.destroy({
+        where: { id: todo_no }
+    });
+    console.log(result);
+    res.send({ success:true, data:result })
+})
 
 
 module.exports = router;

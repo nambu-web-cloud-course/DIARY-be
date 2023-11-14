@@ -3,6 +3,8 @@ const secret = process.env.JWT_SECRET;
 
 const isAuth = async (req, res, next)=>{
     const auth = req.get('Authorization');
+    console.log(auth);
+    // console.log(req);
     if(!(auth && auth.startsWith('Bearer'))){
         return res.send({ message: 'Auth error'});
     };
