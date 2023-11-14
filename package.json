@@ -13,8 +13,8 @@
   "name": "diary_be",
   "version": "1.0.0",
   "main": "app.js",
-  "devDependencies": {},
   "scripts": {
+   
     "start": "npx nodemon app"
   },
   "keywords": [],
