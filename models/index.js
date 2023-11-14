@@ -13,18 +13,22 @@ let sequelize = new Sequelize(
 const Member = require('./member.js');
 const Mydiary = require('./mydiary.js');
 const Todo = require('./Todo.js');
+const Gallery = require('./Gallery.js');
 
 db.Member = Member;
 db.Mydiary = Mydiary;
 db.Todo = Todo;
+db.Gallery = Gallery;
 
 Member.init(sequelize);
 Mydiary.init(sequelize);
 Todo.init(sequelize);
+Gallery.init(sequelize);
 
 Member.associate(db);
 Mydiary.associate(db);
 Todo.associate(db);
+Gallery.associate(db);
 
 db.sequelize = sequelize;
 

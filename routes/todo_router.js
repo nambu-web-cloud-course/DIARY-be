@@ -52,12 +52,14 @@ router.get('/', async (req, res)=>{
 
 
 //members_no로 내 할일 가져오기 http://{{host}}/todos/1
-router.get('/:id', async (req, res)=>{
-    const members_no = req.params.members_no;
+router.get('/:id', isAuth, async (req, res)=>{
+    const members_no = req.params.id;
+
     const result =  await Todo.findAll ({
         where: { members_no: members_no },
         attributes: ['id', 'todo_content', 'created_at', 'updated_at'],
     })
+    console.log('data:', result);
     res.send({ success:true, data: result });
 })
 
@@ -66,23 +68,23 @@ router.put('/:todo_no', async (req, res)=>{
     const todo_no = req.params.todo_no;
     const result = await Todo.update(
         req.body,
-        { where: { members_no: todo_no }}
+        { where: { id: todo_no }}
     );
     console.log(result);
     req.body.id = todo_no;
     res.send({ success: true, data: req.body });
 });
 
-//todo_nof 해당일기 삭제하기 http://{{host}}/todos/1
-router.delete('/:todo_no', async (req, res)=>{
-    res.header("Access-Control-Allow-Origin", "*");
+
+//todo_no로 해당 할일 삭제하기 http://{{host}}/todos/1
+router.delete('/:todo_no', isAuth, async (req, res)=>{
     const todo_no = req.params.todo_no;
     const result = await Todo.destroy({
-        where: { members_no: todo_no }
+        where: { id: todo_no }
     });
     console.log(result);
-    req.body.id = todo_no;
-    res.send({ success:true, data:req.body })
+    res.send({ success:true, data:result })
 })
+
 
 module.exports = router;
