@@ -1,3 +1,4 @@
+
 const express = require('express');
 const router = express.Router();
 const isAuth = require('./authorization.js');
@@ -32,7 +33,7 @@ router.get('/', isAuth, async (req, res)=>{
                 {
                     model: Mydiary,
                     where: { members_no: members_no },
-                    attributes: ['diary_title', 'diary_content', 'cate_data', 'diary_img_path', 'created_at', 'updated_at'],
+                    attributes: ['diary_title', 'diary_content','cate_data', 'created_at', 'updated_at'],
                     order: [['id', 'desc']]
                 },
             ] 
@@ -40,7 +41,7 @@ router.get('/', isAuth, async (req, res)=>{
         res.send({ success:true, data:result });
     } else { //query로 id 입력하지 않았을 때 일기 전체목록
             const result = await Mydiary.findAll({
-            attributes: ['id', 'diary_title', 'diary_content', 'cate_data', 'diary_img_path', 'created_at', 'updated_at'],
+            attributes: ['id', 'diary_title', 'diary_content', 'cate_data', 'created_at', 'updated_at'],
             order: [[ 'id', 'desc' ]]
         });
         res.send({ success:true, data:result });
@@ -52,7 +53,7 @@ router.get('/:members_no', isAuth, async (req, res)=>{
     const members_no = req.params.members_no;
     const result =  await Mydiary.findAll ({
         where: { members_no: members_no },
-        attributes: ['id', 'diary_title', 'diary_content', 'cate_data', 'diary_img_path', 'created_at', 'updated_at'],
+        attributes: ['id', 'diary_title', 'diary_content', 'cate_data', 'created_at', 'updated_at'],
         order: [[ 'id', 'desc' ]]
     })
     res.send({ success:true, data:result });

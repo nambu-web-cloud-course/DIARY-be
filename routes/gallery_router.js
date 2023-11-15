@@ -4,26 +4,16 @@ const isAuth = require('./authorization.js');
 const { Mydiary, Gallery } = require('../models');
 let gallery = [];
 
-
-
 //gallery 전체 가져오기(전체 목록) http://{{host}}/gallery/
-//id로 가져오기(query) http://{{host}}/gallery?id=1
-router.get('/', isAuth, async (req, res)=>{
-    const diary_no = req.query.id;
-    console.log('id', diary_no);
+//id로 가져오기(query) http://{{host}}/gallery?diary_no=1
+router.get('/diary_no', isAuth, async (req, res)=>{
+    const diary_no = req.query.diary_no;
+    console.log('diary_no', diary_no);
     if(diary_no){  //query로 id 입력시
-        const result = await Mydiary.findAll({
+        const result = await Gallery.findAll({
             attributes: ['diary_img_path', 'created_at', 'updated_at'],
-            order: [['id', 'desc']],
-            where: { id: diary_no },
-            include: [
-                {
-                    model: Gallery,
-                    where: { diary_no: diary_no },
-                    attributes: ['diary_img_path', 'created_at', 'updated_at'],
-                    order: [['id', 'desc']]
-                },
-            ]
+            where: { diary_no: diary_no },
+            order: [['id', 'desc']]
         });
         res.send({ success:true, data:result });
     } else { //query로 id 입력하지 않았을때 전체목록
@@ -34,7 +24,5 @@ router.get('/', isAuth, async (req, res)=>{
         res.send({ success:true, data:result });
     };
 });
-
-
 
 module.exports = router;
