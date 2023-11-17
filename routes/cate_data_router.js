@@ -11,28 +11,43 @@ router.post('/', isAuth, async (req, res)=>{
     try{
         const result = await Cate_data.create(new_cate);
         console.log(result);
-        res.send({ success: true, data: new_cate });
+        res.send({ success: true, data: result });
     } catch(error) {
-        res.send({ success: false, data:new_cate, message: "category 등록실패", error:error });
+        res.send({ success: false, message: "category 등록실패", error:error });
     };
 });
 
-//사용자가 선택한 카테고리 데이터 불러오기???
 //cate_data 전체 가져오기(전체 목록) http://{{host}}/cate_data/
+router.get('/', async (req, res)=>{
+    const cate_data = req.body;
+    console.log('cate_data', cate_data);
+    try{
+        const result = await Cate_data.findAll({
+            attributes: ['id', 'cate_data', 'created_at', 'updated_at'],
+            order: [[ 'id', 'desc' ]],
+        });
+        res.send({ success:true, data:result });
+    } catch(error){
+        res.send({ success: true, message: "카테고리 가져오기 실패", error:error });
+    };
+    
+});
+
+
 //diary_no로 가져오기(query) http://{{host}}/cate_data?diary_no=1/
 router.get('/diary_no', isAuth, async (req, res)=>{
     const diary_no = req.query.diary_no;
     console.log('id', diary_no);
     if(diary_no){  //query로 id 입력시
-        const result = await Mydiary.findAll({
-            attributes: ['members_no', 'created_at', 'updated_at'],
+        const result = await Cate_data.findAll({
+            attributes: ['cate_data', 'created_at', 'updated_at'],
             order: [['id', 'desc']],
             where: { id: diary_no },
             include: [
                 {
-                    model: Cate_data,
-                    where: { diary_no: diary_no },
-                    attributes: ['cate_data', 'created_at', 'updated_at'],
+                    model: Mydiary,
+                    where: { cate_data_no: diary_no },
+                    attributes: ['id', 'cate_data', 'created_at', 'updated_at'],
                     order: [['id', 'desc']]
                 },
             ]

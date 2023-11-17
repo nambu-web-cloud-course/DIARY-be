@@ -1,26 +1,36 @@
 const Sequelize = require('sequelize');
+//const { now } = require('sequelize/types/utils');
 
-class Gallery extends Sequelize.Model{
+class Mydiaryimgs extends Sequelize.Model{
     static init(sequelize){
         super.init(
-            { 
+            {
                 //테이블의 컬럼 정의
                 diary_no: {
                     type: Sequelize.INTEGER,
                     allowNull: false,
                     unique: false
                 },
+                // saved_diarytitle: {
+                //     type:Sequelize.STRING(100),
+                //     allowNull:false
+                // },
+                // saved_diarycontent: {
+                //     type: Sequelize.TEXT,
+                //     allowNull: false
+                // },
                 image_path: {
                     type:Sequelize.STRING(1000),
                     allowNull:false
                 },
+            
             },
             {//테이블 설정
                 sequelize,
                 timestamps: true,
                 underscored: true,
-                modelName: 'Gallery',
-                tableName: 'gallery',
+                modelName: 'Mydiaryimgs',
+                tableName: 'mydiaryimgs',
                 paranoid: true,
                 charset: 'utf8',
                 collate: 'utf8_general_ci',
@@ -29,11 +39,8 @@ class Gallery extends Sequelize.Model{
     }
 
     static associate(db){//테이블간 관계 설정
-        db.Gallery.belongsTo(db.Mydiary, { foreignKey: {name:'diary_no', allowNull:false}, sourceKey: 'id' });
-        // db.Gallery.belongsTo(db.Member, { foreignKey: {name:'members_no', allowNull:false}, sourceKey: 'id' });
-           db.Gallery.belongsTo(db.Member, { foreignKey: {name:'diary_no', allowNull:false}, sourceKey: 'id' });
-        
+        db.Mydiaryimgs.belongsTo(db.Mydiary, { foreignKey: 'diary_no', sourceKey: 'id' });
     }
 }
 
-module.exports = Gallery;
+module.exports = Mydiaryimgs;

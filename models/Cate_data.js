@@ -23,7 +23,7 @@ class Cate_data extends Sequelize.Model{
     }
 
     static associate(db){//테이블간 관계 설정
-        db.Cate_data.belongsTo(db.Mydiary, { foreignKey: {name:'id', allowNull:false}, sourceKey: 'id' });
+        // db.Cate_data.belongsTo(db.Mydiary, { foreignKey: {name:'id', allowNull:false}, sourceKey: 'id' });
     }
 }
 

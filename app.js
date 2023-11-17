@@ -14,8 +14,7 @@ const todo_router = require('./routes/todo_router.js');
 const gallery_router = require('./routes/gallery_router.js');
 const cate_data_router = require('./routes/cate_data_router.js');
 const themeimgs_router = require('./routes/themeimgs_router.js');
-const file_router = require('./routes/file_router.js');
-
+// const mydiaryimgs_router = require('./routes/gallery_router.js');
 
 const port = process.env.PORT || 8080;
 const app = express();
@@ -24,6 +23,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors());//모든 포트 접근 허용
+app.use(express.urlencoded({extended:true}))
 
 app.get('/', (req, res)=>{
     if(req.cookies.id){
@@ -43,7 +43,7 @@ app.use('/todos', todo_router);
 app.use('/gallery', gallery_router);
 app.use('/cate_data', cate_data_router);
 app.use('/themeimgs', themeimgs_router);
-app.use('/file', file_router);
+// app.use('/mydiaryimgs', mydiaryimgs_router);
 
 
 app.listen(port, ()=>{

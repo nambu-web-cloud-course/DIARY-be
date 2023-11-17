@@ -7,15 +7,16 @@ let todos = [];
 //할일 등록(추가)하기 http://{{host}}/todos/ -->[body] 1)"members.no": 1, 2)"todo_content": "aaa"
 router.post('/', async (req, res)=>{
     const new_todo = req.body;
-    console.log(`new_todo : ${new_todo}`);
-    res.header("Access-Control-Allow-Origin", "*");
+    new_todo.members_no = req.mid
+    console.log(`new_todo : ${new_todo.todo_content} ${new_todo.members_no}`);
+   
     try{
         // new_todo.id = req.id;
         const result = await Todo.create(new_todo);
         console.log(result);
-        res.send({ success: true, data: new_todo });
+        res.send({ success: true, data: result });
     } catch(error) {
-        res.send({ success: false, data:new_todo, message: "할일 등록실패", error:error });
+        res.send({ success: false, message: "할일 등록실패", error:error });
     };
 });
 

@@ -13,7 +13,7 @@ router.post('/', isAuth, async (req, res)=>{
         // new_diary.id = req.id;
         const result = await Mydiary.create(new_diary);
         console.log(result);
-        res.send({ success: true, data: new_diary });
+        res.send({ success: true, data: result });
     } catch(error) {
         res.send({ success: false, data:new_diary, message: "새일기 등록실패", error:error });
     };
@@ -27,8 +27,8 @@ router.get('/', isAuth, async (req, res)=>{
     if(members_no){ //query로 id 입력시
         const result = await Member.findAll({
             attributes: [ 'member_id', 'member_name', 'created_at', 'updated_at'],
-            order: [['id', 'desc']],
             where: { id: members_no },
+            order: [['id', 'desc']],
             include: [
                 {
                     model: Mydiary,

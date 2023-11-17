@@ -10,15 +10,15 @@ const isAuth = async (req, res, next)=>{
     };
 
     const token = auth.split(' ')[1];
+    
     console.log(secret);
     jwt.verify(token, secret, (error, decoded)=>{
         //member_id가 입력한 비밀번호와 db에 저장된 token 확인하여 인증
         if(error){
             return res.send({ message: 'Auth error2'});
         } else {
-            const id = decoded.mid;
             // const role = decoded.rol;
-            req.id = id;
+            req.mid = decoded.mid;
             // req.role = role;
             next();
         };

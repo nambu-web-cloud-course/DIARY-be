@@ -38,6 +38,8 @@ class Member extends Sequelize.Model{
     static associate(db){ //테이블간 관계 설정
         db.Member.hasMany(db.Mydiary, { foreignKey: 'members_no', sourceKey: 'id'});
         db.Member.hasMany(db.Todo, { foreignKey:{name:'members_no', allowNull:false}, sourceKey: 'id'});
+        // db.Member.hasMany(db.Gallery, { foreignKey:{name:'members_no', allowNull:false}, sourceKey: 'id'});
+        // db.Member.hasMany(db.Gallery, { foreignKey:{name:'diary_no', allowNull:false}, sourceKey: 'id'});
     }
 };
 

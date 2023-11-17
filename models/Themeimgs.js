@@ -6,7 +6,7 @@ class Themeimgs extends Sequelize.Model{
             {//테이블의 컬럼 정의
                 themeimg_title: {
                     type:Sequelize.STRING(100),
-                    allowNull:false
+                    allowNull:true
                 },
                 themeimg_path: {
                     type:Sequelize.STRING(200),
@@ -27,7 +27,7 @@ class Themeimgs extends Sequelize.Model{
     }
 
     static associate(db){//테이블간 관계 설정
-        // db.Themeimgs.belongsTo(db.Mydiary, { foreignKey: {name:'diary_no', allowNull:false}, sourceKey: 'id' });
+        db.Themeimgs.belongsTo(db.Mydiary, { foreignKey: {name:'diary_no', allowNull:false}, sourceKey: 'id' });
     }
 }
 

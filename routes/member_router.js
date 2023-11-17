@@ -5,6 +5,7 @@ const router = express.Router();
 const secret = process.env.JWT_SECRET;
 let members = [];
 const { Member } = require('../models');
+const isAuth = require('./authorization.js');
 
 // 비밀번호 암호화
 const create_hash = async (password, saltRound) => {
@@ -28,10 +29,40 @@ router.post('/sign-up', async (req, res)=>{
     };
 });
 
-//회원 로그인 http://{{host}}/members/sign-in
 router.post('/sign-in', async (req, res)=>{
     const { member_id, password } = req.body;
     const options = { //입력한 아이디와 db에 저장된 아이디가 같은 회원의 'id', 'password'를 options에 담음
+        attributes: ['id','password'],
+        where: { member_id:member_id } //모델속성:키값
+    }
+    const result = await Member.findOne(options);
+    console.log(result);
+
+    if(result){  //회원이 입력한 비밀번호와 db에 저장된 token 비교
+        const compared = await bcrypt.compare(password, result.password);
+        console.log(`${password} : ${result.password} : ${compared}`);
+        if(compared){ //토큰 발행
+            const token = jwt.sign({ mid:result.id }, secret );
+            res.send({
+                success: true,
+                id:result.id,
+                member_id: member_id,
+                token: token
+            });
+        } else {
+            res.send({ success: false, message: '사용자가 없거나 틀린 비밀번호입니다.'});
+        };
+    } else {
+        res.send({ success: false, message: '사용자가 없거나 틀린 비밀번호입니다.'})
+    }
+
+});
+
+//회원정보 가져오기
+router.get('/', isAuth, async (req, res)=>{
+    // const { member_id, password } = req.body;
+    const { member_id, password } = req.body;
+    const options = { 
         attributes: ['id','password'],
         where: { member_id:member_id } //모델속성:키값
     }
