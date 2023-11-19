@@ -27,7 +27,7 @@ class Themeimgs extends Sequelize.Model{
     }
 
     static associate(db){//테이블간 관계 설정
-        db.Themeimgs.hasMany(db.Mydiary, { foreignKey: {name:'theme_no', allowNull:true}, sourceKey: 'id'});
+        // db.Themeimgs.hasMany(db.Mydiary, { foreignKey: {name:'theme_no', allowNull:true}, sourceKey: 'id'});
      }
 }
 

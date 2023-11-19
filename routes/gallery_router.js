@@ -102,7 +102,7 @@ router.get('/', isAuth, async (req, res)=>{
     console.log('members_no', members_no);
     if(members_no){ 
         const result = await Gallery.findAll({
-            attributes: ['diary_no', 'image_path', 'created_at', 'updated_at'],
+            attributes: ['id','diary_no', 'image_path', 'created_at', 'updated_at'],
             order: [['id', 'desc']],
             include: [{
                 model: Mydiary,
@@ -120,15 +120,16 @@ router.get('/', isAuth, async (req, res)=>{
 //diary_no로 가져오기(query) http://{{host}}/gallery/
 router.get('/:diary_no', isAuth, async (req, res)=>{
     const diary_no = req.params.diary_no;
+    const members_no = req.mid;
     console.log('diary_no', diary_no);
     if(diary_no){ 
         const result = await Gallery.findAll({
-            attributes: ['diary_no', 'image_path', 'created_at', 'updated_at'],
+            attributes: ['id','diary_no', 'image_path', 'created_at', 'updated_at'],
             order: [['id', 'desc']],
             include: [{
                 model: Mydiary,
-                where: { id: diary_no },
-                attributes: ['id', 'diary_title', 'diary_content', 'cate_data', 'created_at', 'updated_at'],
+                where: { id: diary_no, members_no: members_no },
+                attributes: ['id', 'diary_title', 'diary_content', 'cate_data_no', 'created_at', 'updated_at'],
                 order: [['id', 'desc']]
                 }] 
         });

@@ -2,5 +2,7 @@
     "appService.zipIgnorePattern": [
         "node_modules{,/**}",
         ".vscode{,/**}"
-    ]
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/97354fa9-6976-4ece-8af8-d05d01b0961e/resourceGroups/rg-memediary/providers/Microsoft.Web/sites/diary-be",
+    "appService.deploySubpath": "."
 }

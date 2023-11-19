@@ -88,7 +88,7 @@ router.post('/', isAuth, upload.array('image_path'), async (req, res)=>{
 
 //사용자가 작성한 일기 전체 가져오기(일기 전체 목록) http://{{host}}/mydiaries/
 router.get('/', isAuth, async (req, res)=>{
-    const members_no = req.query.id;
+    const members_no = req.mid;
     console.log('members_no:', members_no);
     if(members_no){ //query로 id 입력시
         const result = await Member.findAll({

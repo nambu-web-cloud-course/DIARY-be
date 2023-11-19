@@ -66,7 +66,6 @@ router.put('/:todo_no', isAuth, async (req, res)=>{
     res.send({ success: true, data: req.body });
 });
 
-
 //todo_no로 해당 todo 삭제하기 http://{{host}}/todos/1
 router.delete('/:todo_no', isAuth, async (req, res)=>{
     const todo_no = req.params.todo_no;
