@@ -60,7 +60,6 @@ router.post('/sign-in', async (req, res)=>{
 
 //회원정보 가져오기
 router.get('/', isAuth, async (req, res)=>{
-    // const { member_id, password } = req.body;
     const { member_id, password } = req.body;
     const options = { 
         attributes: ['id','password'],

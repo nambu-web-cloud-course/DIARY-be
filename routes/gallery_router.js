@@ -139,6 +139,17 @@ router.get('/:diary_no', isAuth, async (req, res)=>{
 });
 
 
+//diary_no로 해당일기 삭제하기 http://{{host}}/gallery/1
+router.delete('/:gallery_no', isAuth, async (req, res)=>{
+    const gallery_no = req.params.gallery_no;
+    
+    var result = await Gallery.destroy({
+        where: { id: gallery_no }
+    });
+
+    console.log(result);
+    res.send({ success:true, data:result })
+})
 
 module.exports = router;
 

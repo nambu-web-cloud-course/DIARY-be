@@ -31,7 +31,7 @@ class Gallery extends Sequelize.Model{
     static associate(db){//테이블간 관계 설정
         db.Gallery.belongsTo(db.Mydiary, { foreignKey: {name:'diary_no', allowNull:false}, sourceKey: 'id' });
         // db.Gallery.belongsTo(db.Member, { foreignKey: {name:'members_no', allowNull:false}, sourceKey: 'id' });
-           db.Gallery.belongsTo(db.Member, { foreignKey: {name:'diary_no', allowNull:false}, sourceKey: 'id' });
+        // db.Gallery.belongsTo(db.Member, { foreignKey: {name:'diary_no', allowNull:false}, sourceKey: 'id' });
         
     }
 }

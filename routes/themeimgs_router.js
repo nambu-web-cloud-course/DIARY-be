@@ -7,7 +7,7 @@ let themeimgs = [];
 router.use
 
 //배경테마 등록하기 http://{{host}}/themeimgs/
-router.post('/', isAuth, async (req, res)=>{
+router.post('/', async (req, res)=>{
     const new_themeimgs = req.body;
     console.log(new_themeimgs);
     try{
@@ -23,17 +23,15 @@ router.post('/', isAuth, async (req, res)=>{
 
 // themeimgs 전체 가져오기(전체 목록) http://{{host}}/themeimgs/
 // themeimg_no로 가져오기(query) http://{{host}}/themeimgs/
-router.get('/', async (req, res)=>{
-    const themeimgs = req.body;
-    console.log('themeimgs', themeimgs);
+router.get('/', isAuth, async (req, res)=>{
     try{
         const result = await Themeimgs.findAll({
-            attributes: ['id', 'themeimgs_title', 'themeimgs_path', 'created_at', 'updated_at'],
+            attributes: ['id', 'themeimg_title', 'themeimg_path', 'created_at', 'updated_at'],
             order: [[ 'id', 'desc' ]],
         });
         res.send({ success:true, data:result });
     } catch(error){
-        res.send({ success: true, data:themeimgs, message: "배경테마 가져오기 실패", error:error });
+        res.send({ success: true, message: "배경테마 가져오기 실패", error:error });
     };
     
 });

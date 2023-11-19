@@ -9,7 +9,7 @@ class Themeimgs extends Sequelize.Model{
                     allowNull:true
                 },
                 themeimg_path: {
-                    type:Sequelize.STRING(200),
+                    type:Sequelize.STRING(1000),
                     allowNull: false
                 }
             },
@@ -27,8 +27,8 @@ class Themeimgs extends Sequelize.Model{
     }
 
     static associate(db){//테이블간 관계 설정
-        db.Themeimgs.belongsTo(db.Mydiary, { foreignKey: {name:'diary_no', allowNull:false}, sourceKey: 'id' });
-    }
+        db.Themeimgs.hasMany(db.Mydiary, { foreignKey: {name:'theme_no', allowNull:true}, sourceKey: 'id'});
+     }
 }
 
 module.exports = Themeimgs;

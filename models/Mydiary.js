@@ -20,7 +20,7 @@ class Mydiary extends Sequelize.Model{
                     allowNull: false
                 },
                 cate_data_no: {
-                    type:Sequelize.STRING(50),
+                    type:Sequelize.INTEGER,
                     allowNull:false
                 },
                 // diary_img_path: {
@@ -44,8 +44,9 @@ class Mydiary extends Sequelize.Model{
     static associate(db){//테이블간 관계 설정
         db.Mydiary.belongsTo(db.Member, { foreignKey: 'members_no', sourceKey: 'id' });
         db.Mydiary.hasMany(db.Gallery, { foreignKey: {name:'diary_no', allowNull:false}, sourceKey: 'id'});
+        db.Mydiary.belongsTo(db.Themeimgs, { foreignKey: {name:'theme_no', allowNull:false}, sourceKey: 'id' });
+
         // db.Mydiary.hasMany(db.Cate_data, { foreignKey: {name:'id', allowNull:false}, sourceKey: 'id'});
-        db.Mydiary.hasMany(db.Themeimgs, { foreignKey: {name:'diary_no', allowNull:true}, sourceKey: 'id'});
         // db.Mydiary.hasMany(db.Mydiaryimgs, { foreignKey: {name:'diary_no', allowNull:true}, sourceKey: 'id'});
         
     }
