@@ -1,3 +1,5 @@
+const MulterAzureStorage = require('multer-azure-blob-storage').MulterAzureStorage
+
 const fs = require('fs');
 const path = require('path');
 
@@ -12,19 +14,40 @@ let mydiaries = [];
 //새 일기 등록하기 http://{{host}}/mydiaries/ -->body에 새일기 값 입력
 
 //사용자 정의 스토리지 엔진 생성
-const upload = multer({
-    storage: multer.diskStorage({
-        destination(req, file, done){
-            done(null, 'files/');
-        },
-        filename(req, file, done){ //저장할 파일이름 지정
-            const ext = path.extname(file.originalname);
-            done(null, path.basename(file.originalname, ext) + Date.now() + ext);
-            console.log("UploadedName : " + path.basename(file.originalname, ext) + Date.now() + ext);
-        },
-    }), limits: { fileSize: 10 * 1024 * 1024 } //20MB 크기제한
+// const upload = multer({
+//     storage: multer.diskStorage({
+//         destination(req, file, done){
+//             done(null, 'files/');
+//         },
+//         filename(req, file, done){ //저장할 파일이름 지정
+//             const ext = path.extname(file.originalname);
+//             done(null, path.basename(file.originalname, ext) + Date.now() + ext);
+//             console.log("UploadedName : " + path.basename(file.originalname, ext) + Date.now() + ext);
+//         },
+//     }), limits: { fileSize: 10 * 1024 * 1024 } //20MB 크기제한
+// });
+
+const connectionString = 'DefaultEndpointsProtocol=https;AccountName=stmemediary;AccountKey=nAMoIH0i7v05I00jYAsZo3y36ytfVPjBEFF4Q3S4/HYu4dtn2OGZ0jtYwJmYXUAnYHbrdVjoxoNZ+AStVUc9Xw==;EndpointSuffix=core.windows.net';
+const azureKey = 'nAMoIH0i7v05I00jYAsZo3y36ytfVPjBEFF4Q3S4/HYu4dtn2OGZ0jtYwJmYXUAnYHbrdVjoxoNZ+AStVUc9Xw==';
+const accountName ='stmemediary';
+const getBlobName = (req, file)=>{
+    // const ext = path.extname(file.orignalname);
+    // console.log(`orignalname:${file.originalname}, ext:${ext}`)
+    // console.log(`filename: ${file}`);
+    return String(Date.now())+file.originalname;
+};
+
+const azureStorage = new MulterAzureStorage({
+    connectionString: connectionString,
+    accessKey: azureKey,
+    accountName: accountName,
+    containerName: 'images',
+    blobName: getBlobName
 });
 
+const upload = multer({
+    storage: azureStorage
+});
 
 //mydiary 새일기 저장 후 이미지 저장
 router.post('/', isAuth, upload.array('image_path'), async (req, res)=>{
@@ -38,37 +61,37 @@ router.post('/', isAuth, upload.array('image_path'), async (req, res)=>{
     console.log(`new_diary : ${new_diary.diary_content} ${new_diary.members_no}`);
     try{  
         const result = await Mydiary.create(new_diary); //새일기 저장
-        console.log(result);
+        // console.log(result);
         //res.send({ success: true, data: result });
 
         // 저장된 일기의 다이어리 번호 확인
         console.log("result.Mydiary.dataValues.id : " + result.dataValues.id);
         diary_no = result.dataValues.id;
+        // res.send({ success:true, data:result, msg_result:"일기 저장 완료" })
         msg_result = "일기 저장 완료/n";
 
     } catch(error) {
-        res.send({ success: true, data:new_diary, message: "새일기 저장실패", error:error });
-        return;
+        return res.send({ success: true, data:new_diary, message: "새일기 저장실패", error:error });
     };
 
     //일기저장 시 이미지 db저장    
     const files = req.files;
-    // console.log(`File uploaded: ${files}`);
+    console.log(`File uploaded: ${files}`);
     
     // console.log(files[0]);
     try{
         files.map((image)=>{
             console.log('=====', image);
-            const newimage = {diary_no:diary_no, image_path: image.path}
+            const newimage = {diary_no:diary_no, image_path: image.url}
+            console.log(`File saved: ${newimage}`);
             Gallery.create(newimage);  //이미지 저장
             msg_result += "일기 이미지 저장 완료/n";
         })
     } catch(error){
-        res.send({ success: true, message: "새일기 db저장실패", error:error });
-        return;
+        return res.send({ success: true, message: "새일기 db저장실패", error:error });
     }
     
-    res.status(200).send(msg_result);
+    return res.status(200).send(msg_result);
 });
 
 
@@ -209,6 +232,40 @@ router.delete('/:diary_no', isAuth, async (req, res)=>{
     console.log(result);
     res.send({ success:true, data:result })
 })
+
+
+// const connectionString = 'DefaultEndpointsProtocol=https;AccountName=stjmy;AccountKey=fkJ3iyquU9RZMY3y/GUvsEA8ovMMahbM4yENe1ZCjgAgbQqfULNGlcBf0Ct+fJ2EOVYg7+QSZDit+AStGZRn+w==;EndpointSuffix=core.windows.net';
+// const azureKey = 'fkJ3iyquU9RZMY3y/GUvsEA8ovMMahbM4yENe1ZCjgAgbQqfULNGlcBf0Ct+fJ2EOVYg7+QSZDit+AStGZRn+w==';
+// const accountName ='stjmy';
+
+// const getBlobName = (req, file)=>{
+//     const ext = path.extname(file.orignalname);
+//     return path.basename(file.orignalname, ext) + Date.now() + ext;
+// };
+
+// const azureStorage = new MulterAzureStorage({
+//     connectionString: connectionString,
+//     accessKey: azureKey,
+//     accountName: accountName,
+//     containerName: 'images',
+//     blobName: getBlobName
+// });
+
+// const upload = multer ({
+//     storage: azureStorage
+// });
+
+// app.post('/single', upload.single('image'), (req, res)=>{
+//     console.log(req.file);
+//     res.send({success:true});
+// });
+
+
+
+
+
+
+
 
 
 module.exports = router;
