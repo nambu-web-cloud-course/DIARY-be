@@ -1,7 +1,3 @@
-// const fs = require('fs');
-// const path = require('path');
-// const multer = require('multer');
-// const MulterAzureStorage = require('multer-azure-blob-storage').MulterAzureStorage
 
 const express = require('express');
 const morgan = require('morgan');
@@ -22,34 +18,6 @@ const themeimgs_router = require('./routes/themeimgs_router.js');
 
 const port = process.env.PORT || 8080;
 const app = express();
-//-----------------------------------------------------------
-
-// const connectionString = 'DefaultEndpointsProtocol=https;AccountName=stjmy;AccountKey=fkJ3iyquU9RZMY3y/GUvsEA8ovMMahbM4yENe1ZCjgAgbQqfULNGlcBf0Ct+fJ2EOVYg7+QSZDit+AStGZRn+w==;EndpointSuffix=core.windows.net';
-// const azureKey = 'fkJ3iyquU9RZMY3y/GUvsEA8ovMMahbM4yENe1ZCjgAgbQqfULNGlcBf0Ct+fJ2EOVYg7+QSZDit+AStGZRn+w==';
-// const accountName ='stjmy';
-
-// const getBlobName = (req, file)=>{
-//     const ext = path.extname(file.orignalname);
-//     return path.basename(file.orignalname, ext) + Date.now() + ext;
-// };
-
-// const azureStorage = new MulterAzureStorage({
-//     connectionString: connectionString,
-//     accessKey: azureKey,
-//     accountName: accountName,
-//     containerName: 'images',
-//     blobName: getBlobName
-// });
-
-// const upload = multer ({
-//     storage: azureStorage
-// });
-
-// app.post('/single', upload.single('image'), (req, res)=>{
-//     console.log(req.file);
-//     res.send({success:true});
-// });
-//-----------------------------------------------
 
 app.use(morgan('dev'));
 app.use(express.json());

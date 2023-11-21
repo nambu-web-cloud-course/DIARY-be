@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const secret = process.env.JWT_SECRET;
+const secret = process.env.JWT_SECRET || 'secret';
 
 const isAuth = async (req, res, next)=>{
     const auth = req.get('Authorization');
@@ -9,7 +9,7 @@ const isAuth = async (req, res, next)=>{
         return res.send({ message: 'Auth error'});
     };
 
-    const token = auth.split(' ')[1];
+    const token = auth.split(' ')[1]; ///bearer 뺀 토큰값만 token에 저장
     
     console.log(secret);
     jwt.verify(token, secret, (error, decoded)=>{

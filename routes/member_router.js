@@ -70,7 +70,8 @@ router.post('/sign-in', async (req, res)=>{
         const compared = await bcrypt.compare(password, result.password);
         console.log(`${password} : ${result.password} : ${compared}`);
         if(compared){ //토큰 발행
-            const token = jwt.sign({ mid:result.id }, secret );
+            // const token = jwt.sign({ mid:result.id }, secret);
+            const token = jwt.sign({ mid:result.id }, secret, { expiresIn: 60*60*24*1 });
             res.send({
                 success: true,
                 id:result.id,
@@ -83,11 +84,10 @@ router.post('/sign-in', async (req, res)=>{
     } else {
         res.send({ success: true, message: '사용자가 없거나 틀린 비밀번호입니다.'})
     }
-
 });
 
 //회원정보 가져오기
-router.get('/', isAuth, async (req, res)=>{
+router.get('/memberinfo', isAuth, async (req, res)=>{
     const members_no = req.mid;
 
     console.log('members_no:', members_no);
