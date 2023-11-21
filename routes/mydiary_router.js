@@ -10,6 +10,8 @@ const isAuth = require('./authorization.js');
 const { Member, Mydiary, Gallery } = require('../models');
 let mydiaries = [];
 
+// const dotenv = require('dotenv');
+// dotenv.config();
 
 //새 일기 등록하기 http://{{host}}/mydiaries/ -->body에 새일기 값 입력
 
@@ -27,9 +29,14 @@ let mydiaries = [];
 //     }), limits: { fileSize: 10 * 1024 * 1024 } //20MB 크기제한
 // });
 
-const connectionString = 'DefaultEndpointsProtocol=https;AccountName=stmemediary;AccountKey=nAMoIH0i7v05I00jYAsZo3y36ytfVPjBEFF4Q3S4/HYu4dtn2OGZ0jtYwJmYXUAnYHbrdVjoxoNZ+AStVUc9Xw==;EndpointSuffix=core.windows.net';
-const azureKey = 'nAMoIH0i7v05I00jYAsZo3y36ytfVPjBEFF4Q3S4/HYu4dtn2OGZ0jtYwJmYXUAnYHbrdVjoxoNZ+AStVUc9Xw==';
-const accountName ='stmemediary';
+// const connection = 'DefaultEndpointsProtocol=https;AccountName=stmemediary;AccountKey=nAMoIH0i7v05I00jYAsZo3y36ytfVPjBEFF4Q3S4/HYu4dtn2OGZ0jtYwJmYXUAnYHbrdVjoxoNZ+AStVUc9Xw==;EndpointSuffix=core.windows.net';
+// const azureKey = 'nAMoIH0i7v05I00jYAsZo3y36ytfVPjBEFF4Q3S4/HYu4dtn2OGZ0jtYwJmYXUAnYHbrdVjoxoNZ+AStVUc9Xw==';
+// const accountName ='stmemediary';
+
+const connection = process.env.AZURE_STORAGE_CONNECTION;
+const azureKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
+const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+
 const getBlobName = (req, file)=>{
     // const ext = path.extname(file.orignalname);
     // console.log(`orignalname:${file.originalname}, ext:${ext}`)
@@ -38,11 +45,13 @@ const getBlobName = (req, file)=>{
 };
 
 const azureStorage = new MulterAzureStorage({
-    connectionString: connectionString,
+    connectionString: connection,
     accessKey: azureKey,
     accountName: accountName,
     containerName: 'images',
-    blobName: getBlobName
+    blobName: getBlobName,
+    constainerAccessLevel: 'blob', //익명 액세스 수준 설정 'private', 'blob', 'container'
+    urlExpirationTime: -1, //url에 공용액세스 기한 없애는 기능
 });
 
 const upload = multer({
@@ -82,7 +91,9 @@ router.post('/', isAuth, upload.array('image_path'), async (req, res)=>{
     try{
         files.map((image)=>{
             console.log('=====', image);
-            const newimage = {diary_no:diary_no, image_path: image.url}
+            const imageUrl = image.url.split('?')[0]; //url ? 앞에까지 split해서 저장
+            const newimage = {diary_no:diary_no, image_path: imageUrl};
+            // const newimage = {diary_no:diary_no, image_path: image.url};
             console.log(`File saved: ${newimage}`);
             Gallery.create(newimage);  //이미지 저장
             msg_result += "일기 이미지 저장 완료/n";

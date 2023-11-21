@@ -15,18 +15,46 @@ const create_hash = async (password, saltRound) => {
 };
 
 // 회원가입 http://{{host}}/members/sign-up
+// router.post('/sign-up', async (req, res)=>{
+//     const new_member = req.body;
+//     console.log(new_member);
+
+//     new_member.password = await create_hash(new_member.password, 10);
+
+//     try{
+//         const result = await Member.create(new_member);
+//         res.send({ success: true, data:result });
+//     } catch(error){
+//         res.send({ success: false, message: error, error: error });
+//     };
+// });
+
 router.post('/sign-up', async (req, res)=>{
     const new_member = req.body;
     console.log(new_member);
 
-    new_member.password = await create_hash(new_member.password, 10);
+    //입력한 아이디와 db에 저장된 아이디가 같은 회원 'id' 확인
+    const options = { 
+        attributes: ['id','password'],
+        where: { member_id:new_member.member_id } //모델속성:키값
+    }
+    const result = await Member.findOne(options);
+    console.log(result);
 
-    try{
-        const result = await Member.create(new_member);
-        res.send({ success: true, data:result });
-    } catch(error){
-        res.send({ success: false, message: error, error: error });
-    };
+    if(result) {
+   // 같은 아이디가 있을때 오류 처리
+   res.send({ success: false, message: '사용할 수 없는 ID 입니다.'});
+    } else {
+   // 같은 아이디가 없을때 기존 회원가입 프로세스 처리
+       new_member.password = await create_hash(new_member.password, 10);
+
+       try{
+           const result = await Member.create(new_member);
+           res.send({ success: true, data:result });
+       } catch(error){
+           res.send({ success: false, message: error, error: error });
+       };
+    }
 });
 
 router.post('/sign-in', async (req, res)=>{
@@ -72,4 +100,22 @@ router.get('/', isAuth, async (req, res)=>{
 
 });
 
+
+//Logout
+router.get('/logout', isAuth, async (req, res)=>{
+    const members_no = req.mid;
+    // const result = await Member.findOneUpdate({_id: member_id },
+    //     {token:""},
+    //     (err, member_id)=>{
+    //         if(err) return res.join({ success: false, err});
+    //         return res.send({success: true, data:result, message: "정상적으로 로그아웃됐습니다."})
+    //     });
+
+    const result = await Member.findOneUpdate({
+        attributes: ['member_id'],
+        where: { id: members_no }
+        });
+        return res.send({success: true, data:result, message: "정상적으로 로그아웃됐습니다."})
+});
+ 
 module.exports = router;
