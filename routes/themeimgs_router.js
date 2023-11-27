@@ -30,6 +30,7 @@ router.get('/', isAuth, async (req, res)=>{
             order: [[ 'id', 'desc' ]],
         });
         res.send({ success:true, data:result });
+        // res.send(result);
     } catch(error){
         res.send({ success: true, message: "배경테마 가져오기 실패", error:error });
     };

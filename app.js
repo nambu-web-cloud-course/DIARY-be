@@ -45,6 +45,18 @@ app.use('/cate_data', cate_data_router);
 app.use('/themeimgs', themeimgs_router);
 // app.use('/mydiaryimgs', mydiaryimgs_router);
 
+// // path 불러오는 코드 추가!
+// const path = require("path");
+
+// // production mode
+// if(process.env.NODE_ENV === "production") {
+//   app.use(express.static("client/build"));
+
+//   app.get("*", (req, res) => {
+//     // path는 여기에서만 사용되었다.
+//     res.sendFile(path.join(__dirname, "../client/build/index.html"))
+//   })
+// }
 
 app.listen(port, ()=>{
     console.log(`Server is listening at ${port}`)

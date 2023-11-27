@@ -3,7 +3,14 @@ const Sequelize = require('sequelize');
 class Themeimgs extends Sequelize.Model{
     static init(sequelize){
         super.init(
-            {//테이블의 컬럼 정의
+            {              
+                //모델의 속성 정의
+                id: {
+                    type: Sequelize.INTEGER,
+                    autoIncrement: true,
+                    primaryKey: true,
+                },
+                //테이블의 컬럼 정의
                 themeimg_title: {
                     type:Sequelize.STRING(100),
                     allowNull:true

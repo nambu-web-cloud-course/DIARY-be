@@ -89,7 +89,6 @@ router.post('/sign-in', async (req, res)=>{
 //회원정보 가져오기
 router.get('/memberinfo', isAuth, async (req, res)=>{
     const members_no = req.mid;
-
     console.log('members_no:', members_no);
     const result = await Member.findOne({
         attributes: [ 'member_id', 'member_name', 'created_at', 'updated_at'],
@@ -104,14 +103,8 @@ router.get('/memberinfo', isAuth, async (req, res)=>{
 //Logout
 router.get('/logout', isAuth, async (req, res)=>{
     const members_no = req.mid;
-    // const result = await Member.findOneUpdate({_id: member_id },
-    //     {token:""},
-    //     (err, member_id)=>{
-    //         if(err) return res.join({ success: false, err});
-    //         return res.send({success: true, data:result, message: "정상적으로 로그아웃됐습니다."})
-    //     });
-
-    const result = await Member.findOneUpdate({
+    
+    const result = await Member.findOne({
         attributes: ['member_id'],
         where: { id: members_no }
         });
