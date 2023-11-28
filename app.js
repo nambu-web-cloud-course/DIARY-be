@@ -16,6 +16,7 @@ const cate_data_router = require('./routes/cate_data_router.js');
 const themeimgs_router = require('./routes/themeimgs_router.js');
 // const mydiaryimgs_router = require('./routes/gallery_router.js');
 
+
 const port = process.env.PORT || 8080;
 const app = express();
 

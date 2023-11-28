@@ -6,10 +6,11 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 const { Mydiary, Gallery, Member } = require('../models/index.js');
-const { Op } = require('sequelize');
+const { Op, DATE } = require('sequelize');
 dotenv.config();
 const port = process.env.PORT || 8080;
 let gallery = [];
+const utils = require('./utils.js');
 
 //gallery 전체 가져오기(전체 목록) http://{{host}}/gallery/
 // router.get('/', isAuth, async (req, res)=>{
@@ -31,25 +32,55 @@ let gallery = [];
 //         res.send({ success:true, data:"none" });
 //     };
 // });
+
+// const getMonthRange = (dateString) => { //'2023-11-28'
+
+//     //  const dateArray = dateString.split('-');
+//     //  const curYear = dateArray[0]
+    
+//       const date = new Date (dateString);
+//       const curYear = date.getFullYear(); //2023
+//       const curMonth = date.getMonth();
+//       const koreaTimeDiff = 9 * 60 * 60 * 1000;
+//       const beginDate = new Date(curYear, curMonth, 1).getTime();
+//       const endDate = new Date(curYear, curMonth + 1, 0, 23, 59, 59).getTime();
+//       console.log(
+//         new Date(beginDate + koreaTimeDiff),
+//         new Date(endDate + koreaTimeDiff)
+//       );
+    
+//       return {
+//         begin: new Date(beginDate + koreaTimeDiff),
+//         end: new Date(endDate + koreaTimeDiff),
+//       };
+//     };
+
+//     getMonthRange();
+    
 router.get('/', isAuth, async (req, res)=>{
     const members_no = req.mid;
     // const params = req.params;
     const params = req.query;
-    const startDate = '2023-11-01 00:00:00';
-    const endDate = '2023-12-01 00:00:00';
+    
     console.log('members_no', members_no, 'params', params);
-    if(members_no){ 
+
+    if(members_no && params){ 
+        // const bDate = '2023-11-27 00:00:00';
+        // const eDate = '2023-12-01 00:00:00';
+
         const result = await Gallery.findAll({
             attributes: ['id','diary_no', 'image_path', 'created_at', 'updated_at'],
             where: {
                 created_at : {
                     [Op.and]: {
-                    [Op.gte]: startDate, // 이상
-                    [Op.lte]: endDate, // 이하
+                    // [Op.gte]: beginDate, // 이상
+                    // [Op.lte]: endDate, // 이하
+                    [Op.gte]: params.StartDate, // 이상
+                    [Op.lte]: params.EndDate, // 이하
                     }
-                }
+                }, 
             },
-            order: [['id', 'desc']],
+            order: [['id',  params.OrderBy]],
             include: [{
                 model: Mydiary,
                 where: { members_no: members_no},
@@ -62,9 +93,6 @@ router.get('/', isAuth, async (req, res)=>{
         res.send({ success:true, data:"none" });
     };
 });
-
-
-
 
 
 //diary_no로 가져오기(query) http://{{host}}/gallery/

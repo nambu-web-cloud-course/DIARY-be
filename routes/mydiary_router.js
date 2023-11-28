@@ -2,12 +2,12 @@ const MulterAzureStorage = require('multer-azure-blob-storage').MulterAzureStora
 
 const fs = require('fs');
 const path = require('path');
-
+const { Op, DATE } = require('sequelize');
 const multer = require('multer');
 const express = require('express');
 const router = express.Router();
 const isAuth = require('./authorization.js');
-const { Member, Mydiary, Gallery } = require('../models');
+const { Member, Mydiary, Gallery, Themeimgs, Cate_data } = require('../models');
 let mydiaries = [];
 
 // const dotenv = require('dotenv');
@@ -89,9 +89,9 @@ router.post('/', isAuth, upload.array('image_path'), async (req, res)=>{
         try{
             files.map((image)=>{
                 console.log('=====', image);
-                // const imageUrl = image.url.split('?')[0]; //url ? 앞에까지 split해서 저장
-                const newimage = {diary_no:diary_no, image_path: image.path};
-                // const newimage = {diary_no:diary_no, image_path: image.url};
+                const imageUrl = image.url.split('?')[0]; //url ? 앞에까지 split해서 저장
+                // const newimage = {diary_no:diary_no, image_path: image.path};
+                const newimage = {diary_no:diary_no, image_path: imageUrl};
                 console.log(`File saved: ${newimage}`);
                 Gallery.create(newimage);  //이미지 저장
                 msg_result += "일기 이미지 저장 완료/n";
@@ -101,46 +101,83 @@ router.post('/', isAuth, upload.array('image_path'), async (req, res)=>{
         }
     }
     
-    return res.status(200).send(msg_result);
+    return res.status(200).send({msg_result,data:diary_no});
 });
 
 
 //사용자가 작성한 일기 전체 가져오기(일기 전체 목록) http://{{host}}/mydiaries/
 router.get('/', isAuth, async (req, res)=>{
     const members_no = req.mid;
-    console.log('members_no:', members_no);
-    if(members_no){ //query로 id 입력시
+    // console.log('members_no:', members_no);
+
+    const params = req.query;
+    console.log('members_no', members_no, 'params', params);
+
+
+    if(members_no  && params ){ //query로 id 입력시
         const result = await Member.findAll({
             attributes: [ 'member_id', 'member_name', 'created_at', 'updated_at'],
-            where: { id: members_no },
+            where: { 
+                id: members_no,
+            },
             order: [['id', 'desc']],
             include: [
                 {
                     model: Mydiary,
-                    where: { members_no: members_no },
-                    attributes: ['diary_title', 'diary_content','cate_data_no', 'created_at', 'updated_at'],
-                    order: [['id', 'desc']]
+                    where: { members_no: members_no ,
+                        created_at : {
+                            [Op.and]: {
+                                    [Op.gte]: params.StartDate, // 이상
+                                    [Op.lte]: params.EndDate, // 이하
+                            }
+                        }, 
+                     },
+                    attributes: ['id','diary_title', 'diary_content','cate_data_no', 'created_at', 'updated_at'],
+                    order: [['id', 'desc']],
+                    include:[
+                        {
+                            model: Gallery,
+                            // where: { diary_no: diary_no },
+                            attributes: ['id', 'image_path', 'created_at', 'updated_at'],
+                            order: [['id', 'desc']],
+                            required: false,
+                        },
+                        {
+                            model: Themeimgs,
+                            // where: { id: ['theme_data_no'] },
+                            attributes: ['id', 'themeimg_title', 'themeimg_path', 'created_at', 'updated_at'],
+                            required: false,
+                        },
+                        {
+                            model: Cate_data,
+                            // where: { id: ['cate_data_no'] },
+                            attributes: ['id', 'cate_data', 'created_at', 'updated_at'],
+                            required: false,
+                        },
+                    ]
                 },
             ] 
         });
         res.send({ success:true, data:result });
-    } else { //query로 id 입력하지 않았을 때 일기 전체목록
-            const result = await Mydiary.findAll({
-            attributes: ['id', 'diary_title', 'diary_content', 'cate_data_no', 'created_at', 'updated_at'],
-            order: [[ 'id', 'desc' ]]
-        });
-        res.send({ success:true, data:result });
+    } else { 
+        // //query로 id 입력하지 않았을 때 일기 전체목록
+        //     const result = await Mydiary.findAll({
+        //     attributes: ['id', 'diary_title', 'diary_content', 'cate_data_no', 'created_at', 'updated_at'],
+        //     order: [[ 'id', 'desc' ]]
+        // });
+        // res.send({ success:true, data:result });
+        res.send({ success:true, data:"none" });
     };
 });
 
-//사용자가 작성한 일기 전체 가져오기(일기 전체 목록) http://{{host}}/mydiaries/
+//사용자가 작성한 특정 일기 가져오기 http://{{host}}/mydiaries/5
 router.get('/:diary_no', isAuth, async (req, res)=>{
     const members_no = req.mid;
     const diary_no = req.params.diary_no;
     console.log('members_no:', members_no, 'diary_no', diary_no);
 
     const result = await Mydiary.findAll({
-        attributes: [ 'id', 'diary_title', 'diary_content','cate_data_no', 'created_at', 'updated_at'],
+        attributes: [ 'id', 'diary_title', 'diary_content','cate_data_no', 'theme_no','created_at', 'updated_at'],
         where: { id: diary_no, members_no: members_no },
         order: [['id', 'desc']],
         include: [
@@ -148,7 +185,20 @@ router.get('/:diary_no', isAuth, async (req, res)=>{
                 model: Gallery,
                 where: { diary_no: diary_no },
                 attributes: ['id', 'image_path', 'created_at', 'updated_at'],
-                order: [['id', 'desc']]
+                order: [['id', 'desc']],
+                required: false,
+            },
+            {
+                model: Themeimgs,
+                // where: { id: ['theme_data_no'] },
+                attributes: ['id', 'themeimg_title', 'themeimg_path', 'created_at', 'updated_at'],
+                required: false,
+            },
+            {
+                model: Cate_data,
+                // where: { id: ['cate_data_no'] },
+                attributes: ['id', 'cate_data', 'created_at', 'updated_at'],
+                required: false,
             },
         ] 
     });

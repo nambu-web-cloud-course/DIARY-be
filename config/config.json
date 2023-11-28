@@ -4,20 +4,23 @@
     "password": "Pass1234",
     "database": "azure-db-memediary",
     "host": "azure-db-memediary.mysql.database.azure.com",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "timezone": "Asia/Seoul"
   },
   "test": {
     "username": "root",
     "password": null,
     "database": "database_test",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "timezone": "Asia/Seoul"
   },
   "production": {
     "username": "dbuser",
     "password": "Pass1234",
     "database": "azure-db-memediary",
     "host": "azure-db-memediary.mysql.database.azure.com",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "timezone": "Asia/Seoul"
   }
 }
