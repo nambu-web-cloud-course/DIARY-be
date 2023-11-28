@@ -26,11 +26,7 @@ class Mydiary extends Sequelize.Model{
                 theme_no: {
                     type: Sequelize.INTEGER,
                     allowNull: true
-                },
-                // diary_img_path: {
-                //     type:Sequelize.STRING(1000),
-                //     allowNull:false
-                // },
+                }
             },
             {//테이블 설정
                 sequelize,

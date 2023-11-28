@@ -1,4 +1,10 @@
-const { Themeimgs } = require('../models');
+const { Themeimgs, Mydiary } = require('../models');
+const { Member } = require('../models');
+const { Cate_data } = require('../models');
+const { Gallery } = require('../models');
+const { Mydiary } = require('../models');
+const { Todo } = require('../models');
+
 //기존 디비에 있는 테이블을 drop한 후에 재실행 시 적용
 // AUTO_INCREMENT 값을 초기화하는 함수
 async function resetAutoIncrement() {

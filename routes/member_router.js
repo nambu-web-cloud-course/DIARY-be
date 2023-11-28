@@ -15,19 +15,6 @@ const create_hash = async (password, saltRound) => {
 };
 
 // 회원가입 http://{{host}}/members/sign-up
-// router.post('/sign-up', async (req, res)=>{
-//     const new_member = req.body;
-//     console.log(new_member);
-
-//     new_member.password = await create_hash(new_member.password, 10);
-
-//     try{
-//         const result = await Member.create(new_member);
-//         res.send({ success: true, data:result });
-//     } catch(error){
-//         res.send({ success: false, message: error, error: error });
-//     };
-// });
 
 router.post('/sign-up', async (req, res)=>{
     const new_member = req.body;
@@ -57,6 +44,7 @@ router.post('/sign-up', async (req, res)=>{
     }
 });
 
+// 회원 로그인 http://{{host}}/members/sign-in
 router.post('/sign-in', async (req, res)=>{
     const { member_id, password } = req.body;
     const options = { //입력한 아이디와 db에 저장된 아이디가 같은 회원의 'id', 'password'를 options에 담음
@@ -103,7 +91,6 @@ router.get('/memberinfo', isAuth, async (req, res)=>{
 //Logout
 router.get('/logout', isAuth, async (req, res)=>{
     const members_no = req.mid;
-    
     const result = await Member.findOne({
         attributes: ['member_id'],
         where: { id: members_no }
