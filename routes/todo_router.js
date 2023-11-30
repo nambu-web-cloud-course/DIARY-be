@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const isAuth = require('./authorization.js');
 const {  Member, Todo } = require('../models');
+const { Op, DATE } = require('sequelize');
+const Sequelize = require('sequelize');
 let todos = [];
 
 //할일 등록(추가)하기 http://{{host}}/todos/ -->[body] 1)"members.no": 1, 2)"todo_content": "aaa"
@@ -25,19 +27,44 @@ router.post('/', isAuth, async (req, res)=>{
 //로그인된 id로 내가 쓴 할일(todo) 가져오기(query) 
 router.get('/', isAuth, async (req, res)=>{
     const members_no = req.mid
-    console.log('members_no:', members_no);
-    // res.header("Access-Control-Allow-Origin", "*");
-    if(members_no){  
-        const result = await Todo.findAll({
-            attributes: ['id', 'todo_content', 'created_at', 'updated_at'],
-            where: { members_no: members_no },
-            order: [[ 'id', 'desc' ]],
-        });
-        res.send({ success:true, data:result });
-    } else { //query로 id 입력하지 않았을때 전체목록
+    // console.log('members_no:', members_no);
+
+    const params = req.query;
+    console.log('members_no', members_no, 'params', params);
+
+    if(members_no) {
+        if( params ){ //query로 검색 조건값 입력 시 
+            const result = await Todo.findAll({
+                attributes: [
+                                'id', 'todo_content', 'created_at', 'updated_at', 
+                            ],
+                where: { 
+                    members_no: members_no,
+                    created_at : {
+                            [Op.and]: {
+                                    [Op.gte]: params.StartDate, // 이상
+                                    [Op.lte]: params.EndDate, // 이하
+                            }
+                        }, 
+                 },
+                // order: [[ 'id', 'desc' ]],
+            });
+            res.send({ success:true, data:result });
+        } else {
+            const result = await Todo.findAll({
+                attributes: ['id', 'todo_content', 'created_at', 'updated_at'],
+                where: { members_no: members_no },
+                order: [[ 'id', 'desc' ]],
+            });
+            res.send({ success:true, data:result });        
+        }
+
+    }  else { //query로 id 입력하지 않았을때 전체목록
         res.send({ success: true, message: "할일 가져오기실패"});
     };
 });
+
+
 
 
 //지정된 할일 가져오기 http://{{host}}/todos/1
@@ -52,6 +79,7 @@ router.get('/:id', isAuth, async (req, res)=>{
     })
     res.send({ success:true, data: result });
 })
+
 
 //todo_no로 해당 할일 수정하기 http://{{host}}/todos/1
 router.put('/:todo_no', isAuth, async (req, res)=>{
