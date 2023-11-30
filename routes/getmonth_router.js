@@ -29,21 +29,34 @@ router.get('/', isAuth, async (req, res)=>{
             try {
                 // UNION을 위한 SQL 쿼리 작성
                 const unionQuery = `
-                SELECT DISTINCT(BASE.created_date) AS distinctValue
-                FROM (
-                    SELECT DATE_FORMAT(created_at, "%Y.%m.%d") AS created_date
+                    SELECT 'todos' as data_type, DATE_FORMAT(todo_date, "%Y.%m.%d") AS created_date
                     FROM todos 
                     WHERE deleted_at is null 
                         and members_no = :members_no
-                        and created_at between :StartDate and :EndDate
+                        and todo_date between :StartDate and :EndDate
                     UNION
-                    SELECT DATE_FORMAT(created_at, "%Y.%m.%d") AS created_date
+                    SELECT 'mydiaries' as data_type, DATE_FORMAT(created_at, "%Y.%m.%d") AS created_date
                     FROM mydiaries 
                     WHERE deleted_at is null 
                         and members_no = :members_no
                         and created_at between :StartDate and :EndDate
-                ) AS BASE
                 `;
+                // const unionQuery = `
+                // SELECT DISTINCT(BASE.created_date) AS distinctValue
+                // FROM (
+                //     SELECT DATE_FORMAT(created_at, "%Y.%m.%d") AS created_date
+                //     FROM todos 
+                //     WHERE deleted_at is null 
+                //         and members_no = :members_no
+                //         and created_at between :StartDate and :EndDate
+                //     UNION
+                //     SELECT DATE_FORMAT(created_at, "%Y.%m.%d") AS created_date
+                //     FROM mydiaries 
+                //     WHERE deleted_at is null 
+                //         and members_no = :members_no
+                //         and created_at between :StartDate and :EndDate
+                // ) AS BASE
+                // `;
 
                 // Sequelize에서 직접 SQL 쿼리 실행
                 const result = await sequelize.query(unionQuery, {

@@ -12,6 +12,10 @@ class Todo extends Sequelize.Model{
                 todo_content: {
                     type:Sequelize.STRING(200),
                     allowNull: false
+                },
+                todo_date: {
+                    type:Sequelize.DATE,
+                    allowNull: true
                 }
             },
             {//테이블 설정

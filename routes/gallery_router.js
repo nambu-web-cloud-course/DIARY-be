@@ -33,30 +33,6 @@ const utils = require('./utils.js');
 //     };
 // });
 
-// const getMonthRange = (dateString) => { //'2023-11-28'
-
-//     //  const dateArray = dateString.split('-');
-//     //  const curYear = dateArray[0]
-    
-//       const date = new Date (dateString);
-//       const curYear = date.getFullYear(); //2023
-//       const curMonth = date.getMonth();
-//       const koreaTimeDiff = 9 * 60 * 60 * 1000;
-//       const beginDate = new Date(curYear, curMonth, 1).getTime();
-//       const endDate = new Date(curYear, curMonth + 1, 0, 23, 59, 59).getTime();
-//       console.log(
-//         new Date(beginDate + koreaTimeDiff),
-//         new Date(endDate + koreaTimeDiff)
-//       );
-    
-//       return {
-//         begin: new Date(beginDate + koreaTimeDiff),
-//         end: new Date(endDate + koreaTimeDiff),
-//       };
-//     };
-
-//     getMonthRange();
-    
 router.get('/', isAuth, async (req, res)=>{
     const members_no = req.mid;
     // const params = req.params;
@@ -121,14 +97,74 @@ router.get('/:diary_no', isAuth, async (req, res)=>{
 //diary_no로 해당일기 삭제하기 http://{{host}}/gallery/1
 router.delete('/:gallery_no', isAuth, async (req, res)=>{
     const gallery_no = req.params.gallery_no;
-    
+
+    console.log('gallery_no', gallery_no);
+
+    // 에저 파일 삭제 처리
+    if(gallery_no){ 
+        const result = await Gallery.findAll({
+            attributes: ['id', 'image_path', 'created_at', 'updated_at'],
+            order: [['id', 'desc']],
+            where: { id: gallery_no },
+        });
+        console.log({ success:true, data:result[0]?.image_path });
+        
+
+        if(result[0]?.image_path) {
+            // 이미지 경로가 있을 경우 블랍 파일 삭제 트라이
+            // res.send({ success:true, data:result });
+
+            // 경로를 '/'로 나누어 배열로 변환
+            const pathArray = result[0]?.image_path.split('/');
+
+            // 배열에서 마지막 요소, 즉 마지막 파일명 가져오기
+            const lastFileName = pathArray[pathArray.length - 1];
+
+
+            // 권한 인증 오류로 기능 보류
+            // deleteBlob(lastFileName);
+        }
+    } else { //query로 id 입력하지 않았을때 전체목록
+        console.log({ success:true, data:"none" });
+    };
+
+    // var result = "";
     var result = await Gallery.destroy({
         where: { id: gallery_no }
     });
 
     console.log(result);
     res.send({ success:true, data:result })
-})
+});
+
+
+// npm install @azure/storage-blob
+const { BlobServiceClient } = require('@azure/storage-blob');
+const { StorageSharedKeyCredential } = require('@azure/storage-blob');
+const connection = process.env.AZURE_STORAGE_CONNECTION;
+const azureKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
+const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+const containerName = 'images';
+
+const deleteBlob = async (blobName) => {
+    // Azure Storage BlobServiceClient 생성
+    const blobServiceClient = new BlobServiceClient(
+        `https://${accountName}.blob.core.windows.net`,
+        new StorageSharedKeyCredential(accountName, azureKey)
+    );
+
+    // Blob 컨테이너 및 Blob 클라이언트 생성
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+    // Blob 삭제
+    try {
+        await blockBlobClient.delete();
+        console.log('Blob deleted successfully');
+    } catch (error) {
+        console.error('Error deleting blob', error);
+    }
+};
 
 module.exports = router;
 

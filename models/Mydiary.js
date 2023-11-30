@@ -26,7 +26,7 @@ class Mydiary extends Sequelize.Model{
                 theme_no: {
                     type: Sequelize.INTEGER,
                     allowNull: true
-                }
+                },
             },
             {//테이블 설정
                 sequelize,

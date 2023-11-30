@@ -105,6 +105,70 @@ router.post('/', isAuth, upload.array('image_path'), async (req, res)=>{
 });
 
 
+//mydiary 일기 수정 후 이미지 저장
+router.put('/', isAuth, upload.array('image_path'), async (req, res)=>{
+   
+    var diary_no = 0;
+    var msg_result = "";
+    const modify_diary = req.body;
+    modify_diary.members_no = req.mid
+    diary_no = modify_diary.id;
+    //console.log("Runtime :" + runtime++);
+    
+    console.log(modify_diary);
+    console.log(`modify_diary :  ${modify_diary.id} ${modify_diary.diary_content} ${modify_diary.members_no}`);
+    try{  
+        const result = await Mydiary.update(
+            req.body,
+            { where: { id: diary_no, members_no: modify_diary.members_no}}
+        );
+
+        console.log(result);
+        //res.send({ success: true, data: result });
+
+        // 저장된 일기의 다이어리 번호 확인
+        // console.log("result.Mydiary.dataValues.id : " + result.dataValues.id);
+        // diary_no = result.dataValues.id;
+        // res.send({ success:true, data:result, msg_result:"일기 저장 완료" })
+        msg_result = "일기 저장 완료/n";
+
+    } catch(error) {
+        console.log( "일기 수정실패", error);
+        return res.send({ success: true, data:modify_diary, message: "일기 수정실패", error:error });
+    };
+
+    //일기저장 시 이미지 db저장    
+    const files = req.files;
+    console.log(`File uploaded: ${files}`);
+    
+    // console.log(files[0]);
+
+    if(files && files.length > 0) {
+        try{
+            // 기존 다이어리의 이미지 삭제 후 신규 이미지 저장
+            const result = await Gallery.destroy(
+                { where: {diary_no: diary_no}}
+            );
+
+            files.map((image)=>{
+                console.log('=====', image);
+                const imageUrl = image.url.split('?')[0]; //url ? 앞에까지 split해서 저장
+                // const newimage = {diary_no:diary_no, image_path: image.path};
+                const newimage = {diary_no:diary_no, image_path: imageUrl};
+                console.log(`File saved: ${newimage}`);
+                Gallery.create(newimage);  //이미지 저장
+                msg_result += "일기 이미지 저장 완료/n";
+            })
+        } catch(error){
+            return res.send({ success: true, message: "일기 db수정 실패", error:error });
+        }
+    }
+    
+    return res.status(200).send({msg_result,data:diary_no});
+});
+
+
+
 //사용자가 작성한 일기 전체 가져오기(일기 전체 목록) http://{{host}}/mydiaries/
 router.get('/', isAuth, async (req, res)=>{
     const members_no = req.mid;
@@ -206,6 +270,23 @@ router.get('/:diary_no', isAuth, async (req, res)=>{
 
 });
 
+//diary_no로 해당일기 삭제하기 http://{{host}}/mydiaries/1
+router.delete('/:diary_no', isAuth, async (req, res)=>{
+    const diary_no = req.params.diary_no;
+    const members_no = req.mid;
+    
+    var result = await Gallery.destroy({
+        where: { diary_no: diary_no }
+    });
+
+    result = await Mydiary.destroy({
+        where: { id: diary_no, members_no : members_no }
+    });
+
+    console.log(result);
+    res.send({ success:true, data:result })
+})
+
 // //members_no로 내가 쓴 일기 가져오기 http://{{host}}/mydiaries/1
 // router.get('/:members_no', isAuth, async (req, res)=>{
 //     const members_no = req.params.members_no;
@@ -262,22 +343,6 @@ router.get('/:diary_no', isAuth, async (req, res)=>{
 //     res.status(200).send(msg_result);
 // });
 
-// //diary_no로 해당일기 삭제하기 http://{{host}}/mydiaries/1
-// router.delete('/:diary_no', isAuth, async (req, res)=>{
-//     const diary_no = req.params.diary_no;
-//     const members_no = req.mid;
-    
-//     var result = await Gallery.destroy({
-//         where: { diary_no: diary_no }
-//     });
-
-//     result = await Mydiary.destroy({
-//         where: { id: diary_no, members_no : members_no }
-//     });
-
-//     console.log(result);
-//     res.send({ success:true, data:result })
-// })
 
 module.exports = router;
 

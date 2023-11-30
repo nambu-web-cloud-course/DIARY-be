@@ -40,7 +40,7 @@ router.get('/', isAuth, async (req, res)=>{
                             ],
                 where: { 
                     members_no: members_no,
-                    created_at : {
+                    todo_date : {
                             [Op.and]: {
                                     [Op.gte]: params.StartDate, // 이상
                                     [Op.lte]: params.EndDate, // 이하
